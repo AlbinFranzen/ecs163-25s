@@ -1,0 +1,539 @@
+/* --- Global Styles & Resets --- */
+/*
+ * Establishes base styling for the HTML document, including box-sizing
+ * and default font size.
+ */
+ html {
+    box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+    font-size: 16px; /* Base font size for rem unit calculations */
+}
+
+/*
+ * Inherits box-sizing for all elements and pseudo-elements,
+ * simplifying layout calculations.
+ */
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/*
+ * Basic reset for body and html elements to ensure full viewport usage
+ * and remove default margins/padding.
+ */
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents scrollbars on the main body/html elements */
+}
+
+/*
+ * Sets default font, background color, text color, and line height for the body.
+ * Uses flex display to help ensure full height content.
+ */
+body {
+    font-family: 'Lato', sans-serif; /* Specifies the primary font, with a generic sans-serif fallback */
+    background-color: #f0f2f5; /* A light grey background for the overall page */
+    color: #333; /* Default text color */
+    line-height: 1.5; /* Standard line spacing for readability */
+    display: flex; /* Enables flexbox layout for the body */
+}
+
+/* --- Dashboard Layout --- */
+/*
+ * Styles for the main wrapper containing the entire dashboard.
+ * Uses flexbox to manage the header and content areas.
+ */
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: column; /* Arranges children (header, content) vertically */
+    width: 100%;
+    height: 100%;
+    padding: 1rem; /* Padding around the entire dashboard */
+    overflow: hidden; /* Prevents the wrapper itself from showing scrollbars */
+}
+
+/*
+ * Styles for the header section of the dashboard.
+ * Includes padding and a bottom border for visual separation.
+ */
+.dashboard-header {
+    padding-bottom: 0.8rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #d9d9d9; /* A subtle line to separate header from content */
+    flex-shrink: 0; /* Prevents the header from shrinking if content is too large */
+}
+
+/*
+ * Styles for the main title (H1) within the dashboard header.
+ */
+.dashboard-header h1 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.8rem;
+    font-weight: 700; /* Bold font weight for the main title */
+    color: #2c3e50; /* A darker, muted blue for the title text */
+}
+
+/*
+ * Styles for descriptive text (P) within the dashboard header.
+ */
+.dashboard-header p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555; /* Slightly lighter text color for descriptions */
+    max-width: 800px; /* Limits the width of the paragraph for better readability */
+}
+
+/*
+ * Styles for the main content area of the dashboard, which holds the chart columns.
+ * Uses flexbox to arrange columns side-by-side.
+ */
+.dashboard-content {
+    display: flex;
+    flex-grow: 1; /* Allows this area to expand and fill available vertical space */
+    gap: 1rem; /* Defines the space between the left and right columns */
+    min-height: 0; /* A flexbox hack to ensure proper sizing within a flex container */
+    overflow: hidden; /* Prevents this content area from showing scrollbars */
+}
+
+/*
+ * Styles for the left column, which contains one or more charts.
+ * Uses flexbox to arrange charts vertically within this column.
+ */
+.left-column {
+    width: 38%; /* Specifies the proportion of width for the left column */
+    display: flex;
+    flex-direction: column; /* Arranges charts vertically */
+    gap: 1rem; /* Defines the space between charts in this column */
+    min-width: 0; /* Prevents flex items from overflowing their container */
+}
+
+/*
+ * Styles for the right column, typically containing a larger chart.
+ */
+.right-column {
+    width: 62%; /* Specifies the proportion of width for the right column */
+    display: flex;
+    flex-direction: column; /* Ensures content within behaves as a column */
+    min-width: 0; /* Prevents flex items from overflowing their container */
+}
+
+/* --- Chart Container Styling --- */
+/*
+ * General styling for individual chart containers.
+ * Each container holds one chart (SVG).
+ * Uses flexbox to center the SVG within.
+ */
+.chart-container {
+    flex-grow: 1; /* Allows chart containers to expand within their column */
+    position: relative; /* Establishes a positioning context for absolute children (like SVGs) */
+    background-color: #ffffff; /* White background for chart areas */
+    border-radius: 8px; /* Rounded corners for a softer look */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+    padding: 5px; /* Visual padding around the chart, SVG itself might have internal margins */
+    min-height: 200px; /* Ensures containers have a minimum height */
+
+    /* Flexbox properties to center the SVG child */
+    display: flex;
+    justify-content: center; /* Centers SVG horizontally */
+    align-items: center;   /* Centers SVG vertically */
+    overflow: hidden;      /* Clips any content (like oversized SVGs if not handled by viewBox) */
+}
+
+/*
+ * Styles for placeholder text displayed when a chart is not yet loaded or fails to load.
+ */
+.chart-placeholder {
+    color: #aaa; /* Light grey color for placeholder text */
+    font-style: italic;
+    position: relative; /* Kept for consistency, z-index might be used with it */
+    z-index: 0; /* Ensures placeholder is behind the SVG if both were somehow visible */
+}
+
+/*
+ * Styles for SVG elements dynamically added by D3.js into chart containers.
+ * Positions the SVG absolutely to fill the container's padding box.
+ */
+.chart-container svg {
+    display: block;       /* Removes extra space below inline elements like SVG */
+    position: absolute;   /* Positions SVG relative to .chart-container */
+    width: 100%;          /* Makes SVG take the full width of the container */
+    height: 100%;         /* Makes SVG take the full height of the container */
+    z-index: 1;           /* Ensures SVG is drawn on top of the placeholder */
+    padding: 10px;        /* Internal padding for the SVG content, distinct from .chart-container's padding */
+}
+
+
+/*
+ * Hides the placeholder text when an SVG is present in the chart container.
+ * Uses the :has() pseudo-class for modern browsers for a cleaner check.
+ */
+.chart-container svg + .chart-placeholder, /* Sibling combinator for older browser compatibility */
+.chart-container:has(svg) .chart-placeholder { /* Modern approach: if container has an SVG, hide placeholder */
+     display: none;
+}
+
+/* --- Chart Specific Element Styling --- */
+/*
+ * General styling for D3.js generated axes (paths and lines).
+ */
+.axis path,
+.axis line {
+    fill: none; /* Axes lines are typically not filled */
+    stroke: #d9d9d9; /* Light grey color for axis lines */
+    shape-rendering: crispEdges; /* Optimizes rendering for sharp, clean lines */
+    stroke-width: 1px;
+}
+
+/*
+ * General styling for text elements within D3.js axes (tick labels).
+ */
+.axis text {
+    font-size: 10px;
+    fill: #555; /* Dark grey for axis text for readability */
+    font-family: 'Lato', sans-serif; /* Consistent font */
+}
+
+/*
+ * Styling for axis labels (e.g., "Primary Type", "Total Stats").
+ */
+.axis-label {
+    font-size: 12px;
+    fill: #333; /* Standard text color for axis labels */
+    text-anchor: middle; /* Centers the label text */
+    font-weight: 400; /* Normal font weight */
+}
+
+/*
+ * Styling for text elements within chart legends.
+ */
+.legend text {
+    font-size: 10px;
+    fill: #555;
+    font-family: 'Lato', sans-serif;
+}
+
+/* --- Parallel Coordinates Plot Specific Styles --- */
+/*
+ * Styling for the paths (lines) in the Parallel Coordinates Plot.
+ */
+.pcp-path {
+    fill: none; /* Paths are lines, not filled shapes */
+    stroke-opacity: 0.4; /* Semi-transparent lines by default */
+    stroke-width: 1.5px;
+}
+/*
+ * Hover effect for paths in the Parallel Coordinates Plot.
+ * Increases opacity and stroke width to highlight the hovered line.
+ */
+.pcp-path:hover {
+    stroke-opacity: 1; /* Fully opaque on hover */
+    stroke-width: 2.5px; /* Thicker line on hover */
+}
+
+/* --- Ridgeline Plot Specific Styles --- */
+/*
+ * Styling for the area paths (ridges) in the Ridgeline Plot.
+ */
+.ridge-area {
+    fill: #5dade2; /* A soft blue color for the ridges */
+    fill-opacity: 0.7; /* Semi-transparent fill */
+    stroke: #333; /* Darker stroke for contrast around the ridges */
+    stroke-width: 0.5px;
+}
+/*
+ * Hover effect for ridges in the Ridgeline Plot.
+ * Increases fill opacity to make the hovered ridge more prominent.
+ */
+.ridge-area:hover {
+    fill-opacity: 0.9;
+}
+
+/* --- Stacked Bar Chart Specific Styles --- */
+/*
+ * Styling for the individual rectangle segments in the Stacked Bar Chart.
+ */
+.stacked-bar-rect {
+    /* Base fill color is applied dynamically via D3 .style("fill", colorScale(d.key)) */
+    stroke: rgba(255, 255, 255, 0.3); /* Subtle white stroke to separate segments within a bar */
+    stroke-width: 0.5px;
+}
+/*
+ * Hover effect for segments in the Stacked Bar Chart.
+ * Changes stroke to black for a clear highlight.
+ */
+.stacked-bar-rect:hover {
+    stroke: black; /* Black stroke on hover for emphasis */
+    stroke-width: 1.5px;
+}
+```/* filepath: /Users/albinfranzen/Desktop/Projects/ecs163-25s/Homework2/alfranzen/style.css */
+/* --- Global Styles & Resets --- */
+/*
+ * Establishes base styling for the HTML document, including box-sizing
+ * and default font size.
+ */
+html {
+    box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+    font-size: 16px; /* Base font size for rem unit calculations */
+}
+
+/*
+ * Inherits box-sizing for all elements and pseudo-elements,
+ * simplifying layout calculations.
+ */
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/*
+ * Basic reset for body and html elements to ensure full viewport usage
+ * and remove default margins/padding.
+ */
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents scrollbars on the main body/html elements */
+}
+
+/*
+ * Sets default font, background color, text color, and line height for the body.
+ * Uses flex display to help ensure full height content.
+ */
+body {
+    font-family: 'Lato', sans-serif; /* Specifies the primary font, with a generic sans-serif fallback */
+    background-color: #f0f2f5; /* A light grey background for the overall page */
+    color: #333; /* Default text color */
+    line-height: 1.5; /* Standard line spacing for readability */
+    display: flex; /* Enables flexbox layout for the body */
+}
+
+/* --- Dashboard Layout --- */
+/*
+ * Styles for the main wrapper containing the entire dashboard.
+ * Uses flexbox to manage the header and content areas.
+ */
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: column; /* Arranges children (header, content) vertically */
+    width: 100%;
+    height: 100%;
+    padding: 1rem; /* Padding around the entire dashboard */
+    overflow: hidden; /* Prevents the wrapper itself from showing scrollbars */
+}
+
+/*
+ * Styles for the header section of the dashboard.
+ * Includes padding and a bottom border for visual separation.
+ */
+.dashboard-header {
+    padding-bottom: 0.8rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #d9d9d9; /* A subtle line to separate header from content */
+    flex-shrink: 0; /* Prevents the header from shrinking if content is too large */
+}
+
+/*
+ * Styles for the main title (H1) within the dashboard header.
+ */
+.dashboard-header h1 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.8rem;
+    font-weight: 700; /* Bold font weight for the main title */
+    color: #2c3e50; /* A darker, muted blue for the title text */
+}
+
+/*
+ * Styles for descriptive text (P) within the dashboard header.
+ */
+.dashboard-header p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555; /* Slightly lighter text color for descriptions */
+    max-width: 800px; /* Limits the width of the paragraph for better readability */
+}
+
+/*
+ * Styles for the main content area of the dashboard, which holds the chart columns.
+ * Uses flexbox to arrange columns side-by-side.
+ */
+.dashboard-content {
+    display: flex;
+    flex-grow: 1; /* Allows this area to expand and fill available vertical space */
+    gap: 1rem; /* Defines the space between the left and right columns */
+    min-height: 0; /* A flexbox hack to ensure proper sizing within a flex container */
+    overflow: hidden; /* Prevents this content area from showing scrollbars */
+}
+
+/*
+ * Styles for the left column, which contains one or more charts.
+ * Uses flexbox to arrange charts vertically within this column.
+ */
+.left-column {
+    width: 38%; /* Specifies the proportion of width for the left column */
+    display: flex;
+    flex-direction: column; /* Arranges charts vertically */
+    gap: 1rem; /* Defines the space between charts in this column */
+    min-width: 0; /* Prevents flex items from overflowing their container */
+}
+
+/*
+ * Styles for the right column, typically containing a larger chart.
+ */
+.right-column {
+    width: 62%; /* Specifies the proportion of width for the right column */
+    display: flex;
+    flex-direction: column; /* Ensures content within behaves as a column */
+    min-width: 0; /* Prevents flex items from overflowing their container */
+}
+
+/* --- Chart Container Styling --- */
+/*
+ * General styling for individual chart containers.
+ * Each container holds one chart (SVG).
+ * Uses flexbox to center the SVG within.
+ */
+.chart-container {
+    flex-grow: 1; /* Allows chart containers to expand within their column */
+    position: relative; /* Establishes a positioning context for absolute children (like SVGs) */
+    background-color: #ffffff; /* White background for chart areas */
+    border-radius: 8px; /* Rounded corners for a softer look */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+    padding: 5px; /* Visual padding around the chart, SVG itself might have internal margins */
+    min-height: 200px; /* Ensures containers have a minimum height */
+
+    /* Flexbox properties to center the SVG child */
+    display: flex;
+    justify-content: center; /* Centers SVG horizontally */
+    align-items: center;   /* Centers SVG vertically */
+    overflow: hidden;      /* Clips any content (like oversized SVGs if not handled by viewBox) */
+}
+
+/*
+ * Styles for placeholder text displayed when a chart is not yet loaded or fails to load.
+ */
+.chart-placeholder {
+    color: #aaa; /* Light grey color for placeholder text */
+    font-style: italic;
+    position: relative; /* Kept for consistency, z-index might be used with it */
+    z-index: 0; /* Ensures placeholder is behind the SVG if both were somehow visible */
+}
+
+/*
+ * Styles for SVG elements dynamically added by D3.js into chart containers.
+ * Positions the SVG absolutely to fill the container's padding box.
+ */
+.chart-container svg {
+    display: block;       /* Removes extra space below inline elements like SVG */
+    position: absolute;   /* Positions SVG relative to .chart-container */
+    width: 100%;          /* Makes SVG take the full width of the container */
+    height: 100%;         /* Makes SVG take the full height of the container */
+    z-index: 1;           /* Ensures SVG is drawn on top of the placeholder */
+    padding: 10px;        /* Internal padding for the SVG content, distinct from .chart-container's padding */
+}
+
+
+/*
+ * Hides the placeholder text when an SVG is present in the chart container.
+ * Uses the :has() pseudo-class for modern browsers for a cleaner check.
+ */
+.chart-container svg + .chart-placeholder, /* Sibling combinator for older browser compatibility */
+.chart-container:has(svg) .chart-placeholder { /* Modern approach: if container has an SVG, hide placeholder */
+     display: none;
+}
+
+/* --- Chart Specific Element Styling --- */
+/*
+ * General styling for D3.js generated axes (paths and lines).
+ */
+.axis path,
+.axis line {
+    fill: none; /* Axes lines are typically not filled */
+    stroke: #d9d9d9; /* Light grey color for axis lines */
+    shape-rendering: crispEdges; /* Optimizes rendering for sharp, clean lines */
+    stroke-width: 1px;
+}
+
+/*
+ * General styling for text elements within D3.js axes (tick labels).
+ */
+.axis text {
+    font-size: 10px;
+    fill: #555; /* Dark grey for axis text for readability */
+    font-family: 'Lato', sans-serif; /* Consistent font */
+}
+
+/*
+ * Styling for axis labels (e.g., "Primary Type", "Total Stats").
+ */
+.axis-label {
+    font-size: 12px;
+    fill: #333; /* Standard text color for axis labels */
+    text-anchor: middle; /* Centers the label text */
+    font-weight: 400; /* Normal font weight */
+}
+
+/*
+ * Styling for text elements within chart legends.
+ */
+.legend text {
+    font-size: 10px;
+    fill: #555;
+    font-family: 'Lato', sans-serif;
+}
+
+/* --- Parallel Coordinates Plot Specific Styles --- */
+/*
+ * Styling for the paths (lines) in the Parallel Coordinates Plot.
+ */
+.pcp-path {
+    fill: none; /* Paths are lines, not filled shapes */
+    stroke-opacity: 0.4; /* Semi-transparent lines by default */
+    stroke-width: 1.5px;
+}
+/*
+ * Hover effect for paths in the Parallel Coordinates Plot.
+ * Increases opacity and stroke width to highlight the hovered line.
+ */
+.pcp-path:hover {
+    stroke-opacity: 1; /* Fully opaque on hover */
+    stroke-width: 2.5px; /* Thicker line on hover */
+}
+
+/* --- Ridgeline Plot Specific Styles --- */
+/*
+ * Styling for the area paths (ridges) in the Ridgeline Plot.
+ */
+.ridge-area {
+    fill: #5dade2; /* A soft blue color for the ridges */
+    fill-opacity: 0.7; /* Semi-transparent fill */
+    stroke: #333; /* Darker stroke for contrast around the ridges */
+    stroke-width: 0.5px;
+}
+/*
+ * Hover effect for ridges in the Ridgeline Plot.
+ * Increases fill opacity to make the hovered ridge more prominent.
+ */
+.ridge-area:hover {
+    fill-opacity: 0.9;
+}
+
+/* --- Stacked Bar Chart Specific Styles --- */
+/*
+ * Styling for the individual rectangle segments in the Stacked Bar Chart.
+ */
+.stacked-bar-rect {
+    /* Base fill color is applied dynamically via D3 .style("fill", colorScale(d.key)) */
+    stroke: rgba(255, 255, 255, 0.3); /* Subtle white stroke to separate segments within a bar */
+    stroke-width: 0.5px;
+}
+/*
+ * Hover effect for segments in the Stacked Bar Chart.
+ * Changes stroke to black for a clear highlight.
+ */
+.stacked-bar-rect:hover {
+    stroke: black; /* Black stroke on hover for emphasis */
+    stroke-width: 1.5px;
+}

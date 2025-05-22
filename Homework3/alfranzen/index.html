@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"> 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="description" content="Interactive Pokemon Stat Dashboard">
+    <title>Pokémon Stat Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <header class="dashboard-header">
+            <h1>Pokémon Dashboard</h1>
+            <p>In this dashboard for ECS163 we explore  Pokémon attributes. A Pokémon has the attributes health, attack, defense, special attack, special defense and speed. They also have a primary and secondary type. For my animations I used a drill-down approach with brushing to select cateogries in the parallel coordinates plot, selection for the stacked bar chart and an animation for the ridgeline plot.  </p>
+        </header>
+
+        <main class="dashboard-content">
+            <div class="left-column">
+                <div id="topLeftChart" class="chart-container">
+                    <div class="chart-placeholder">Loading Chart...</div> 
+                </div>
+                <div id="bottomLeftChart" class="chart-container">
+                     <div class="chart-placeholder">Loading Chart...</div> 
+                </div>
+            </div>
+            <div class="right-column">
+                <div id="rightChart" class="chart-container">
+                     <div class="chart-placeholder">Loading Chart...</div> 
+                </div>
+            </div>
+        </main> 
+    </div> 
+
+    <!-- D3 version 7 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
