@@ -48,7 +48,6 @@ Some design considerations to make before crafting your animated transitions:
   * In the cases where a complex transition is unavoidable, one can break up the transition into a set of simple subtransitions, allowing multiple changes to be easily observed. (e.g. separating axis rescaling from value changes may help).
 * Make transitions as long as needed, but no longer.
   * Transition stages and dwells between them must be long enough for accurate change tracking, but when too slow can result in longer task times and diminished engagement. This isn't easy to determine all the time but use your best judgment.
-
 For more details about these principles refer to:
 Heer, Jeffrey, and George Robertson. "Animated transitions in statistical data graphics." IEEE Transactions on Visualization and Computer Graphics 13.6 (2007): 1240-1247.
 
